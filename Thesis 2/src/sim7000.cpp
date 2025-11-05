@@ -15,9 +15,9 @@ const char* apnList[] = {
 };
 const int apnCount = 2;
 
-const char* host = "192.168.1.158";
-const int httpPort = 3000;
-const char* endpoint = "/post_gps";
+const char* host = "ambulance-gps-server-production.up.railway.app";
+const int httpPort = 80;
+const char* endpoint = "/gps_api/post_gps.php";
 
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
@@ -65,15 +65,17 @@ client.connect(host, httpPort);
   SerialMon.println("\n📤 Sending GPS Data (HTTP):");
   SerialMon.println("http://" + String(host) + ":" + String(httpPort) + url);
 
-  if (!client.connect(host, httpPort)) {
-    SerialMon.println("❌ HTTP Connection Failed");
-    return;
-  }
+if (!client.connect(host, httpPort)) {
+  SerialMon.println("❌ HTTP Connection Failed");
+  return;
+}
 
-  // Send HTTP GET Request
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: " + host + "\r\n" +
-               "Connection: close\r\n\r\n");
+client.print(
+  String("GET ") + endpoint + "?lat=" + lat + "&lon=" + lon + "&speed=" + speed + 
+  "&alt=" + alt + "&vsat=" + vsat + "&usat=" + usat + "&acc=" + acc + " HTTP/1.1\r\n" +
+  "Host: " + host + "\r\n" +
+  "Connection: close\r\n\r\n"
+);
 
   SerialMon.println("\n----- SERVER RESPONSE -----");
   unsigned long timeout = millis();
