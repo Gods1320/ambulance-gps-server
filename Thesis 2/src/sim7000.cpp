@@ -17,7 +17,7 @@ const int apnCount = 2;
 
 const char* host = "ambulance-gps-server-production.up.railway.app";
 const int httpPort = 80;
-const char* endpoint = "/gps_api/post_gps.php";
+const char* endpoint = "/post_gps";   // not php anymore
 
 TinyGsm modem(SerialAT);
 TinyGsmClient client(modem);
