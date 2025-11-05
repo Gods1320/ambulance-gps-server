@@ -13,13 +13,12 @@ const db = mysql.createPool({
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE,
   port: process.env.MYSQLPORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
   ssl: {
-    rejectUnauthorized: false  // ✅ REQUIRED for Railway
-  }
+    rejectUnauthorized: false
+  },
+  connectTimeout: 20000  // 20 seconds wait for Railway
 });
+
 
 // Test DB
 db.getConnection((err) => {
