@@ -4,40 +4,45 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // ✅ Required to read JSON POST body
 
-// ✅ Replace with your Atlas URI
-const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://geshybarbia_db_user:geshy123456@thesis.yrcxczx.mongodb.net/ambulance_gps?retryWrites=true&w=majority&appName=Thesis";
+// ✅ MongoDB Atlas connection
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://geshybarbia_db_user:geshy123456@thesis.yrcxczx.mongodb.net/ambulance_gps";
 
-mongoose.connect(MONGO_URI)
+mongoose
+  .connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ MongoDB Error:", err));
+  .catch((err) => console.log("❌ MongoDB Error:", err));
 
-// ✅ Create GPS Model
-const gpsSchema = new mongoose.Schema({
-  lat: Number,
-  lon: Number,
-  speed: Number,
-  alt: Number,
-  vsat: Number,
-  usat: Number,
-  acc: Number,
-  timestamp: { type: Date, default: Date.now }
-});
+// ✅ GPS Schema & Model
+const gpsSchema = new mongoose.Schema(
+  {
+    lat: Number,
+    lon: Number,
+    speed: Number,
+    alt: Number,
+    vsat: Number,
+    usat: Number,
+    acc: Number
+  },
+  { timestamps: true }
+);
 
 const GPS = mongoose.model("gps_logs", gpsSchema);
 
-// ✅ ESP32 Endpoint
-app.get("/post_gps", async (req, res) => {
+// ✅ ESP32 sends POST (not GET)
+app.post("/post_gps", async (req, res) => {
   try {
-    await GPS.create(req.query);
-    console.log("✅ GPS Saved:", req.query.lat, req.query.lon);
-    res.send("OK");
+    console.log("📥 Incoming GPS Data:", req.body);
+
+    await GPS.create(req.body);
+
+    return res.status(200).json({ status: "saved" });
   } catch (err) {
     console.log("❌ Insert Error:", err);
-    res.status(500).send("DB Error");
+    return res.status(500).json({ error: "DB Error", details: err.message });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
