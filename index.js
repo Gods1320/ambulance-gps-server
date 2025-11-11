@@ -4,7 +4,10 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // ✅ Required to read JSON POST body
+app.use(express.json({ limit: "50kb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.text()); // <--- add this one
+ // ✅ Required to read JSON POST body
 
 // ✅ MongoDB Atlas connection
 const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://geshybarbia_db_user:geshy123456@thesis.yrcxczx.mongodb.net/ambulance_gps";
