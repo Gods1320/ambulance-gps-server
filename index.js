@@ -6,7 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "50kb" }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.text()); // <--- add this one
  // ✅ Required to read JSON POST body
 
 // ✅ MongoDB Atlas connection
